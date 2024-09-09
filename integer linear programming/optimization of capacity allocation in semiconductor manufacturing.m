@@ -1,6 +1,6 @@
 % Define the number of recipes and machines
-numRecipes = 12;
-numMachines = 11;
+`numRecipes` = 12;
+`numMachines` = 11;
 
 % Define the demand for each recipe
 Demand = [9500, 9350, 8695, 6540, 5645, 6820, 9860, 14535, 12540,

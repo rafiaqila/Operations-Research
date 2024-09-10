@@ -11,4 +11,4 @@ The research focuses on optimizing capacity allocation in the photolithography a
 - Reduction in the Mean Absolute Deviation (MAD) from 43.23 to 0.003, indicating a more balanced workload.
 
 ## Repository Contents
-- `optimization_of_capacity_allocation.m`: Main MATLAB script that implements the ILP model for optimizing the allocation of machine capacity in semiconductor manufacturing.
+- `capacity allocation optimization.m`: Main MATLAB script that implements the ILP model for optimizing the allocation of machine capacity in semiconductor manufacturing.

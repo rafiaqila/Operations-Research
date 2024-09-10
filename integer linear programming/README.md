@@ -1,6 +1,6 @@
 # Optimization of Capacity Allocation in Semiconductor Manufacturing
 
-This repository contains MATLAB code that supports the research paper titled "Optimization of Capacity Allocation Using Integer Linear Programming in a Semiconductor Manufacturing Company," authored by Rafi Aqila Hidayat and Kuan Yew Wong, presented at ICMLSC 2025.
+This repository contains MATLAB code that supports the research paper titled "Optimization of Capacity Allocation Using Integer Linear Programming in a Semiconductor Manufacturing Company," authored by Rafi Aqila Hidayat and Kuan Yew Wong.
 
 ## Abstract
 The research focuses on optimizing capacity allocation in the photolithography area of semiconductor manufacturing using Integer Linear Programming (ILP). The primary goal is to enhance machine utilization rates and balance workloads across various machines while satisfying the wafer demand for each machine and recipe.

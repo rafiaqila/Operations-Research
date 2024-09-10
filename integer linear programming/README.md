@@ -31,8 +31,26 @@ Where \( U_{ij} \) represents the utilization of machine \( i \) for recipe \( j
 - **Integer and Non-Negativity Constraints:** Decision variables should be non-negative integers.
   \[ x_{ij} \geq 0, x_{ij} \in \mathbb{Z}^+, \forall i, j \]
 
+## Visualization of Results
+
+### Machine Utilization Rates Before and After Optimization
+
+The following graphs illustrate the machine utilization rates at a semiconductor manufacturing company's photolithography area before and after applying the Integer Linear Programming model.
+
+#### Before Optimization
+![Machine Utilization Rates Before Optimization](machine_utilization_rates_before_optimization.png)
+
+The graph shows some machines operating well above the capacity limit (100%), indicating significant overutilization, which can lead to increased maintenance requirements and reduced machine lifespan.
+
+#### After Optimization
+![Machine Utilization Rates After Optimization](machine_utilization_rates_after_optimization.png)
+
+After applying the ILP model, all machines have their utilization rates well balanced and below the 100% capacity limit. This optimal distribution ensures that no single machine is overburdened, reducing the risk of machine downtime and maintenance, thereby improving the overall efficiency of the manufacturing process.
+
 ## Repository Contents
 - `capacity allocation optimization.m`: Main MATLAB script that implements the ILP model for optimizing the allocation of machine capacity in semiconductor manufacturing.
+- `machine utilization rates before optimization.png`: The visualization of machine utilization rates before optimization.
+- `machine utilization rates after optimization.png`: The visualization of machine utilization rates after optimization.
 
 ## Contact
 - Rafi Aqila Hidayat - [email](mailto:rafi.hidayat@graduate.utm.my)

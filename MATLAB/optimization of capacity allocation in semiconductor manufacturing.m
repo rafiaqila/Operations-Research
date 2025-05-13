@@ -1,0 +1,125 @@
+% Define the number of recipes and machines
+numRecipes = 12;
+numMachines = 11;
+
+% Define the demand for each recipe
+Demand = [9500, 9350, 8695, 6540, 5645, 6820, 9860, 14535, 12540,
+    10690, 8690, 14000];
+
+% Define the machine availability for each machine
+MachineAvailability = 10080; % All machines have the same availability
+
+% Define the process capability in 12x11 matrix
+ProcessCapability = [
+    1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0;
+    1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0;
+    1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0;
+    1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0;
+    1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0;
+    1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0;
+    1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0;
+    1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0;
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1;
+    1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0;
+    1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0;
+    1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0;
+];
+
+% Define the tool processing time in 12x11 matrix
+ToolProcessingTime = [
+    0.253, 1e6, 1e6, 1e6, 0.946, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6;
+    0.269, 1e6, 1e6, 1e6, 0.868, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6;
+    0.276, 0.288, 1e6, 0.546, 1e6, 0.896, 0.98, 1e6, 1.012, 1e6, 1e6;
+    0.284, 1e6, 1e6, 0.546, 1e6, 0.896, 0.963, 1e6, 1e6, 1.07, 1e6;
+    0.287, 1e6, 0.527, 0.529, 0.936, 1e6, 1e6, 1e6, 1e6, 1e6, 1e6;
+    0.303, 1e6, 0.593, 1e6, 1.079, 1e6, 1e6, 1e6, 1.987, 1e6, 1e6;
+    0.303, 1e6, 1e6, 0.529, 1e6, 0.879, 0.972, 1.252, 1e6, 1.551, 1e6;
+    0.27, 0.288, 0.51, 0.546, 0.788, 0.891, 1.022, 1.336, 1e6, 1e6, 1e6;
+    0.337, 1e6, 1e6, 0.589, 1e6, 1.112, 1.23, 1e6, 1e6, 1e6, 1.566;
+    0.298, 1e6, 1e6, 0.546, 1.016, 0.946, 1.13, 1e6, 1e6, 1.856, 1e6;
+    0.253, 0.271, 1e6, 0.519, 0.839, 0.935, 0.988, 1.269, 1.479, 1.573,
+    1e6;
+    0.27, 0.321, 1e6, 0.589, 1.023, 0.912, 1e6, 1.186, 1.996, 1.66, 1e6;
+];
+
+% Create the decision variables as a matrix
+x = optimvar('x', numRecipes, numMachines, 'Type', 'integer', ...
+    'LowerBound', 0);
+
+% Define a new optimization variable representing the maximum utilization
+maxUtilization = optimvar('maxUtilization', 'LowerBound', 0, ...
+    'UpperBound', 100);
+
+% Define the objective function to maximize total utilization
+MachineAvailabilityMatrix = repmat(MachineAvailability, ...
+    numRecipes, numMachines);
+objective = sum(sum((x .* ToolProcessingTime .* ProcessCapability) ./ ...
+    MachineAvailabilityMatrix));
+
+% Constraints
+% Capacity constraints
+capacityConstraints = sum(x .* ToolProcessingTime .* ProcessCapability, 2)
+<= MachineAvailability;
+
+% Demand constraints
+demandConstraints = sum(x, 2) == Demand';
+
+% Define the optimization problem
+prob = optimproblem('Objective', objective);
+
+% Add capacity constraints to the problem
+for j = 1:numMachines
+    capConstraint = sum(x(:, j) .* ToolProcessingTime(:, j) .* ...
+        ProcessCapability(:, j)) <= maxUtilization *
+    MachineAvailability / 100;
+    prob.Constraints.(['maxCap' num2str(j)]) = capConstraint;
+end
+
+% Add demand constraints to the problem
+for i = 1:numRecipes
+    % Sum over machines for each recipe should be equal to demand
+    demandConstraint = sum(x(i, :) .* ProcessCapability(i, :)) 
+    ==D emand(i);
+    prob.Constraints.(['demand' num2str(i)]) = demandConstraint;
+end
+
+% Change the objective to minimize the maximum utilization
+prob.Objective = maxUtilization;
+
+% Options for the solver
+options = optimoptions('intlinprog', 'Display', 'iter', ...
+    'IntegerTolerance', 1e-6, 'ConstraintTolerance', 1e-6);
+
+% Solve the problem
+[sol, fval, exitflag, output] = solve(prob, 'options', options);
+
+% Extract the solution values
+solutionValues = sol.x;
+
+% Display the optimal number of wafers allocated for each recipe on each machine
+disp('Optimal number of wafers allocated for each recipe on each machine:');
+disp(round(solutionValues));  % Ensure rounding is applied if needed
+
+% Calculate and display utilization
+utilization = abs((solutionValues .* ToolProcessingTime .* ProcessCapability) * 100 / MachineAvailability);  % Apply abs() to ensure positive values
+
+% Display the utilization percentage
+disp('Utilization percentage for each recipe on each machine:');
+for i = 1:numRecipes
+    for j = 1:numMachines
+        fprintf('%6.2f%% ', utilization(i, j));  % Ensures display as positive percentages with two decimal places
+    end
+    fprintf('\n');
+end
+
+fprintf('\n');
+
+% Calculate total utilization of each machine
+totalUtilizationPerMachine = sum(utilization, 1); % Sum across rows (i.e., sum for each column)
+
+% Display the total utilization of each machine
+disp('Total utilization of each machine:');
+for j = 1:numMachines
+    fprintf('Machine %d: %6.2f%%\n', j, totalUtilizationPerMachine(j));
+end
+
